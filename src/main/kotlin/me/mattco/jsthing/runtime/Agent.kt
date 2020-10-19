@@ -1,7 +1,7 @@
 package me.mattco.jsthing.runtime
 
+import me.mattco.jsthing.ast.other.ScriptNode
 import me.mattco.jsthing.parser.Parser
-import me.mattco.jsthing.parser.ast.Script
 import me.mattco.jsthing.runtime.contexts.ExecutionContext
 import me.mattco.jsthing.runtime.environment.GlobalEnvRecord
 import me.mattco.jsthing.runtime.values.nonprimitives.objects.Attributes
@@ -19,6 +19,7 @@ class Agent(val signifier: Any = "Agent${agentCount++}") {
         get() = contexts.last()
 
     private var createGlobalObjectHook = { realm: Realm -> JSGlobalObject(realm) }
+    private var executed = false
 
     init {
         if (signifier in agentIdentifiers)
@@ -58,11 +59,18 @@ class Agent(val signifier: Any = "Agent${agentCount++}") {
     }
 
     fun execute(script: String) {
-        execute(Parser(script).parse())
+        execute(Parser.parse(script) ?: throw Error("null script :("))
     }
 
-    fun execute(script: Script) {
-        TODO()
+    fun execute(script: ScriptNode) {
+        if (executed) {
+            TODO("Support running multiple things on a single Agent")
+        }
+        executed = true
+
+        val globalEnv = runningContext.realm.globalEnv
+        runningContext.lexicalEnv = globalEnv
+        runningContext.variableEnv = globalEnv
     }
 
     internal fun addContext(context: ExecutionContext) {
