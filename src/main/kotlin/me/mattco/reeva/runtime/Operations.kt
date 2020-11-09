@@ -27,6 +27,8 @@ import me.mattco.reeva.runtime.builtins.promises.JSResolveFunction
 import me.mattco.reeva.runtime.functions.JSBoundFunction
 import me.mattco.reeva.runtime.functions.JSFunction
 import me.mattco.reeva.runtime.functions.JSNativeFunction
+import me.mattco.reeva.runtime.memory.DataBlock
+import me.mattco.reeva.runtime.memory.OwnDataBlock
 import me.mattco.reeva.runtime.objects.Descriptor
 import me.mattco.reeva.runtime.objects.JSObject
 import me.mattco.reeva.runtime.objects.PropertyKey
@@ -352,6 +354,20 @@ object Operations {
         ecmaAssert(base is EnvRecord)
         expect(reference.name.isString)
         base.initializeBinding(reference.name.asString, value)
+    }
+
+    @ECMAImpl("6.2.8.1")
+    fun createByteDataBlock(size: Int): DataBlock {
+        ecmaAssert(size >= 0)
+        // TODO: Impose maximum size?
+        return OwnDataBlock(size)
+    }
+
+    @ECMAImpl("6.2.8.2")
+    fun createSharedByteDataBlock(size: Int): DataBlock {
+        ecmaAssert(size >= 0)
+        // TODO: Impose maximum size?
+        TODO()
     }
 
     enum class ToPrimitiveHint(private val _text: String) {
